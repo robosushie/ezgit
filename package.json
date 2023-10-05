@@ -1,0 +1,33 @@
+{
+  "name": "ezgit",
+  "version": "1.0.0",
+  "description": "Ezgit is simple tool to streamline your git process. It uses OpenAI to refactor code and auto-generate git messages.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "bin": {
+    "ezgit": "bin/ezgit.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/robosushie/ezgit.git"
+  },
+  "keywords": [
+    "ezgit",
+    "openai",
+    "git",
+    "git"
+  ],
+  "author": "robosushie",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/robosushie/ezgit/issues"
+  },
+  "homepage": "https://github.com/robosushie/ezgit#readme",
+  "dependencies": {
+    "dotenv": "^16.3.1",
+    "openai": "^4.11.1",
+    "yargs": "^17.7.2"
+  }
+}
