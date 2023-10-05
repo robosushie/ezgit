@@ -59,7 +59,7 @@ const commitHandler = async () => {
   const message = await generateCommitMessage(config, diff);
   console.log(message);
 
-  // run(`git commit -m "${message}"`);
+  run(`git commit -m "${message}"`);
 };
 
 const defaultHandler = async () => {
@@ -70,7 +70,7 @@ const defaultHandler = async () => {
     return;
   }
 
-  // run(`git ${args.join(" ")}`);
+  run(`git ${args.join(" ")}`);
 };
 
 if (command === "init") {
