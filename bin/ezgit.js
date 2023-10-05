@@ -1,7 +1,7 @@
 #! /usr/bin/env node
 const dotenv = require("dotenv");
 const yargs = require("yargs");
-const ezgit = require("../index");
+const { verifyPathExists, run, generateCommitMessage } = require("../index");
 const { default_ezgit_config } = require("../constants");
 const fs = require("fs");
 const path = require("path");
@@ -14,18 +14,18 @@ const command = args[0];
 
 const rootDirectory = path.join(__dirname, "..");
 
-if (command === "init") {
+const initHandler = async () => {
   if (args.length > 1) {
     console.error("Too many arguments provided.");
     return;
   }
-  if (!ezgit.verifyPathExists("package.json")) {
+  if (!verifyPathExists("package.json")) {
     console.error(
       "Cannot find 'package.json'. Ensure you're in a Node.js project directory."
     );
     return;
   }
-  if (ezgit.verifyPathExists("ezgit.config.js")) {
+  if (verifyPathExists("ezgit.config.js")) {
     console.info("Initialization for 'ezgit' already completed.");
     return;
   }
@@ -37,22 +37,46 @@ if (command === "init") {
     }
     console.log("Successfully created the config file.");
   });
-} else if (command === "start") {
-} else {
-  if (!ezgit.verifyPathExists("ezgit.config.js")) {
+};
+
+const commitHandler = async () => {
+  if (!verifyPathExists("ezgit.config.js")) {
     console.error(
       "Cannot find 'ezgit.config.js'. Ensure 'ezgit' is initialized in project directory."
     );
     return;
   }
 
-  // const config = require(`${rootDirectory}/ezgit.config.js`);
-  // const commands = config.commands;
-  // if (!(command in commands)) {
-  //   console.error(
-  //     `Invalid command - ${command} does not exist in commands list`
-  //   );
-  // }
+  const config = require(`${rootDirectory}/ezgit.config.js`);
 
-  // Run the commands
+  run(`git add .`);
+
+  const excludeList = config["exclude-file-list"];
+  const excludeCmd = excludeList.map((item) => `:(exclude)` + item + ``);
+  const diff = run(`git diff --staged -- . ${excludeCmd.join(" ")}`);
+  // console.log(diff);
+
+  const message = await generateCommitMessage(config, diff);
+  console.log(message);
+
+  // run(`git commit -m "${message}"`);
+};
+
+const defaultHandler = async () => {
+  if (!verifyPathExists("ezgit.config.js")) {
+    console.error(
+      "Cannot find 'ezgit.config.js'. Ensure 'ezgit' is initialized in project directory."
+    );
+    return;
+  }
+
+  // run(`git ${args.join(" ")}`);
+};
+
+if (command === "init") {
+  initHandler();
+} else if (command === "commit") {
+  commitHandler();
+} else {
+  defaultHandler();
 }
