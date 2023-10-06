@@ -12,7 +12,7 @@ dotenv.config({ path: ".env.local" });
 const args = yargs.argv._;
 const command = args[0];
 
-const rootDirectory = path.join(__dirname, "..");
+const rootDirectory = process.cwd();
 
 const initHandler = async () => {
   if (args.length > 1) {

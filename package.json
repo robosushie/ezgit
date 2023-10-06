@@ -1,6 +1,6 @@
 {
   "name": "@robosushie/ezgit",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Ezgit is simple tool to streamline your git process. It uses OpenAI to refactor code and auto-generate git messages.",
   "main": "index.js",
   "scripts": {
