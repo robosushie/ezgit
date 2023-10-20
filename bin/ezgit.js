@@ -11,6 +11,7 @@ dotenv.config({ path: ".env.local" });
 
 const args = yargs.argv._;
 const command = args[0];
+const gpt_version = yargs.gptv;
 
 const rootDirectory = process.cwd();
 
@@ -39,7 +40,7 @@ const initHandler = async () => {
   });
 };
 
-const commitHandler = async () => {
+const commitHandler = async (gpt_version) => {
   if (!verifyPathExists("ezgit.config.js")) {
     console.error(
       "Cannot find 'ezgit.config.js'. Ensure 'ezgit' is initialized in project directory."
@@ -56,7 +57,7 @@ const commitHandler = async () => {
   const diff = run(`git diff --staged -- . ${excludeCmd.join(" ")}`);
   // console.log(diff);
 
-  const message = await generateCommitMessage(config, diff);
+  const message = await generateCommitMessage(config, diff, gpt_version);
   console.log(message);
 
   run(`git commit -m "${message}"`);
@@ -76,7 +77,7 @@ const defaultHandler = async () => {
 if (command === "init") {
   initHandler();
 } else if (command === "commit") {
-  commitHandler();
+  commitHandler(gpt_version);
 } else {
   defaultHandler();
 }

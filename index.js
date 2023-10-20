@@ -10,7 +10,15 @@ const run = (command) => {
   return execSync(command, { encoding: "utf-8" });
 };
 
-const generateCommitMessage = async (config, diff) => {
+const getGPTVersion = (gpt_version) => {
+  if (gpt_version == "gpt-4") {
+    return "gpt-4";
+  } else {
+    return "gpt-3.5-turbo";
+  }
+};
+
+const generateCommitMessage = async (config, diff, gpt_version) => {
   if (!config["openai-api-key"]) {
     console.error(
       "OpenAI API key not configured, please follow instructions in README.md"
@@ -24,7 +32,7 @@ const generateCommitMessage = async (config, diff) => {
       { role: `system`, content: config.prompts.commit.system },
       { role: "user", content: `${config.prompts.commit.user} ${diff}` },
     ],
-    model: "gpt-3.5-turbo",
+    model: getGPTVersion(gpt_version),
   });
   return response.choices[0].message.content;
 };
