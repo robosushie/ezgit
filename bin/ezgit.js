@@ -1,7 +1,14 @@
 #! /usr/bin/env node
 const dotenv = require("dotenv");
 const yargs = require("yargs");
-const { verifyPathExists, run, generateCommitMessage } = require("../index");
+const {
+  verifyPathExists,
+  run,
+  generateCommitMessage,
+  getGPTVersion,
+  refactorCode,
+  extractJSX,
+} = require("../index");
 const { default_ezgit_config } = require("../constants");
 const fs = require("fs");
 const path = require("path");
@@ -11,7 +18,9 @@ dotenv.config({ path: ".env.local" });
 
 const args = yargs.argv._;
 const command = args[0];
-const gpt_version = yargs.gptv;
+const gpt_version = yargs.argv.gptv;
+const file_path = yargs.argv.path;
+console.log(args, file_path);
 
 const rootDirectory = process.cwd();
 
@@ -40,7 +49,7 @@ const initHandler = async () => {
   });
 };
 
-const commitHandler = async (gpt_version) => {
+const commitHandler = async () => {
   if (!verifyPathExists("ezgit.config.js")) {
     console.error(
       "Cannot find 'ezgit.config.js'. Ensure 'ezgit' is initialized in project directory."
@@ -49,6 +58,7 @@ const commitHandler = async (gpt_version) => {
   }
 
   const config = require(`${rootDirectory}/ezgit.config.js`);
+  config["gpt-version"] = getGPTVersion(gpt_version);
 
   run(`git add .`);
 
@@ -57,10 +67,36 @@ const commitHandler = async (gpt_version) => {
   const diff = run(`git diff --staged -- . ${excludeCmd.join(" ")}`);
   // console.log(diff);
 
-  const message = await generateCommitMessage(config, diff, gpt_version);
+  const message = await generateCommitMessage(config, diff);
   console.log(message);
 
   run(`git commit -m "${message}"`);
+};
+
+const refactorHandler = async () => {
+  if (!verifyPathExists("ezgit.config.js")) {
+    console.error(
+      "Cannot find 'ezgit.config.js'. Ensure 'ezgit' is initialized in project directory."
+    );
+    return;
+  }
+
+  if (!verifyPathExists(file_path)) {
+    console.error(`Cannot find ${file_path}. Ensure the file path exists.`);
+    return;
+  }
+
+  const config = require(`${rootDirectory}/ezgit.config.js`);
+  let file_content = fs.readFileSync(file_path, "utf8");
+  // console.log(file_content);
+  file_content = await refactorCode(config, file_content);
+  // console.log(file_content);
+  file_content = extractJSX(file_content);
+  if (file_content) {
+    fs.writeFileSync(file_path, file_content, "utf8");
+  } else {
+    console.log("Unable to refactor properly !!");
+  }
 };
 
 const defaultHandler = async () => {
@@ -77,7 +113,9 @@ const defaultHandler = async () => {
 if (command === "init") {
   initHandler();
 } else if (command === "commit") {
-  commitHandler(gpt_version);
+  commitHandler();
+} else if (command === "refactor") {
+  refactorHandler();
 } else {
   defaultHandler();
 }
