@@ -39,7 +39,14 @@ This will check for the presence of a `package.json` file to ensure you're in a 
 npx ezgit commit
 ```
 
-3. **Other Git Commands**:
+3. **Refactoring Code**:
+   To auto-refactor a file using OpenAI:
+
+```bash
+npx ezgit refactor --path <file path>
+```
+
+4. **Other Git Commands**:
    You can also use `ezgit` to run other git commands:
 
 ```bash
