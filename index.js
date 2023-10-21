@@ -10,11 +10,13 @@ const run = (command) => {
   return execSync(command, { encoding: "utf-8" });
 };
 
-const getGPTVersion = (gpt_version) => {
+const getGPTVersion = (config, gpt_version) => {
   if (gpt_version == "gpt-4") {
     return "gpt-4";
-  } else {
+  } else if (gpt_version == "gpt-3.5-turbo") {
     return "gpt-3.5-turbo";
+  } else {
+    return config["gpt-version"];
   }
 };
 
@@ -32,7 +34,7 @@ const generateCommitMessage = async (config, diff, gpt_version) => {
       { role: `system`, content: config.prompts.commit.system },
       { role: "user", content: `${config.prompts.commit.user} ${diff}` },
     ],
-    model: getGPTVersion(gpt_version),
+    model: getGPTVersion(config, gpt_version),
   });
   return response.choices[0].message.content;
 };
