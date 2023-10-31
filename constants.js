@@ -10,8 +10,7 @@ module.exports = {
 
   prompts:{
     commit: {
-      system: "As a professional software developer working on a scale project.",
-      user:"Using the following diff, write a short commit message with a short title and points - ",
+      user:"Write a short commit message using the following diff ",
     },
     refactor: {
       user:"Refactor the code \n",
